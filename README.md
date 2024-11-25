@@ -1,18 +1,18 @@
-# CypherLang White Paper README  
+# SypherLang White Paper README  
 
 ## **Introduction**  
-The CypherLang White Paper outlines the vision and technical architecture behind **CypherLang**, a secure and scalable blockchain ecosystem developed by CipherCoRetech. This decentralized framework focuses on privacy, smart contract optimization, and seamless integration for a wide range of use cases.  
+The SypherLang White Paper outlines the vision and technical architecture behind **SypherLang**, a secure and scalable blockchain ecosystem developed by SypherCoRetech. This decentralized framework focuses on privacy, smart contract optimization, and seamless integration for a wide range of use cases.  
 
 **Repository URL:** [GitHub - CipherLang](https://github.com/CipherCoRetech/CipherLang)  
 
 ---  
 
 ## **Overview**  
-CypherLang leverages advanced cryptographic methods, including zero-knowledge proofs and ring signatures, to ensure user privacy and transactional security. The ecosystem's domain-specific language (DSL), **CypherLang**, is designed for crafting efficient and secure smart contracts with minimal complexity.  
+SypherLang leverages advanced cryptographic methods, including zero-knowledge proofs and ring signatures, to ensure user privacy and transactional security. The ecosystem's domain-specific language (DSL), **SypherLang**, is designed for crafting efficient and secure smart contracts with minimal complexity.  
 
 ### **Core Features**  
 - **Privacy First:** Ring signatures and zero-knowledge proofs for anonymous transactions.  
-- **Efficient Smart Contracts:** Use of the CypherLang DSL to streamline and secure contract execution.  
+- **Efficient Smart Contracts:** Use of the SypherLang DSL to streamline and secure contract execution.  
 - **Scalability:** Implementation of sharding for high throughput and reduced latency.  
 - **Decentralized Governance:** Community-driven decisions to enhance ecosystem transparency.  
 
@@ -36,7 +36,7 @@ python -m unittest discover tests
 ```  
 
 ### **Explore the White Paper**  
-Access the full CypherLang white paper for a comprehensive understanding of the project’s goals and architecture:  
+Access the full SypherLang white paper for a comprehensive understanding of the project’s goals and architecture:  
 [CypherLang White Paper](https://github.com/CipherCoRetech/CipherLang)  
 
 ---  
@@ -53,15 +53,15 @@ Access the full CypherLang white paper for a comprehensive understanding of the 
 
 ## **Support & Community**  
 
-- **Website:** [CipherLang Official](https://github.com/CipherCoRetech/CipherLang)  
+- **Website:** [SypherLang Official](https://github.com/CipherCoRetech/CipherLang)  
 - **Discussion Forum:** Engage with other developers and contributors.  
 - **Contact:** For queries, reach out via support channels in the repository.  
 
 ---  
 
 ## **License**  
-CypherLang is open-source under the **MIT License**. Contributions from the community are highly encouraged!  
+SypherLang is open-source under the **MIT License**. Contributions from the community are highly encouraged!  
 
 ---  
 
-For additional information, refer to the white paper or explore our GitHub repository: [CipherLang Repository](https://github.com/CipherCoRetech/CipherLang).
+For additional information, refer to the white paper or explore our GitHub repository: [SypherLang Repository](https://github.com/CipherCoRetech/CipherLang).
