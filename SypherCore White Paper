@@ -34,7 +34,7 @@ To ensure that SypherCore remains secure in the future, even against the potenti
 
 ### 4. Sypherlang: A Privacy-Focused Programming Language
 
-SypherCore is powered by **Sypherlang**, a new programming language designed specifically for privacy. Cipherlang enables the creation of secure, private smart contracts and applications with ease. Unlike traditional programming languages, Sypherlang has built-in support for advanced privacy features like ZKPs and encrypted data storage. It also provides powerful libraries for cryptography and privacy-focused applications.
+SypherCore is powered by **Sypherlang**, a new programming language designed specifically for privacy. Sypherlang enables the creation of secure, private smart contracts and applications with ease. Unlike traditional programming languages, Sypherlang has built-in support for advanced privacy features like ZKPs and encrypted data storage. It also provides powerful libraries for cryptography and privacy-focused applications.
 
 ---
 
