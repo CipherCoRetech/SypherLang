@@ -42,7 +42,7 @@ SypherCore is powered by **Sypherlang**, a new programming language designed spe
 
 ### 1. Token Supply
 
-CipherCore's tokenomics are designed to promote sustainability and fairness while incentivizing network growth and security. The total supply of CipherCore tokens is **121 million**, with a **deflationary model** to ensure scarcity and long-term value retention. This token supply will be used for staking, transaction fees, and network rewards.
+SypherCore's tokenomics are designed to promote sustainability and fairness while incentivizing network growth and security. The total supply of CipherCore tokens is **121 million**, with a **deflationary model** to ensure scarcity and long-term value retention. This token supply will be used for staking, transaction fees, and network rewards.
 
 #### Token Breakdown:
 - **Total Supply**: 121 million SypherCore tokens
@@ -72,34 +72,34 @@ SypherCore tokens (CORE) serve multiple purposes within the CipherCore ecosystem
 
 ## Technology Stack
 
-### 1. Cipherlang
+### 1. Sypherlang
 
-CipherCore’s blockchain is built using **Cipherlang**, an advanced privacy-first programming language designed for creating smart contracts and decentralized applications (dApps). Cipherlang is unique in its ability to handle **Zero-Knowledge Proofs (ZKPs)** and other privacy-centric features directly within the language, making it an ideal tool for building secure, private applications.
+SypherCore’s blockchain is built using **Sypherlang**, an advanced privacy-first programming language designed for creating smart contracts and decentralized applications (dApps). Sypherlang is unique in its ability to handle **Zero-Knowledge Proofs (ZKPs)** and other privacy-centric features directly within the language, making it an ideal tool for building secure, private applications.
 
 ### 2. Zero-Knowledge Proofs (ZKPs) & SNARKs
 
-CipherCore’s core privacy mechanism is built on **Zero-Knowledge Proofs** (ZKPs) and **Succinct Non-Interactive Arguments of Knowledge (SNARKs)**. These cryptographic techniques allow transactions to be validated without revealing any private information. CipherCore uses ZKPs to ensure that transactions are completely private while remaining verifiable by the network.
+SypherCore’s core privacy mechanism is built on **Zero-Knowledge Proofs** (ZKPs) and **Succinct Non-Interactive Arguments of Knowledge (SNARKs)**. These cryptographic techniques allow transactions to be validated without revealing any private information. SypherCore uses ZKPs to ensure that transactions are completely private while remaining verifiable by the network.
 
 ### 3. Quantum-Resistant Cryptography
 
-CipherCore utilizes **lattice-based cryptography** for **quantum-resistance**, ensuring that user data is secure even in the face of quantum computing threats. The cryptography libraries used are designed to provide robust protection against the future risks posed by quantum computing.
+SypherCore utilizes **lattice-based cryptography** for **quantum-resistance**, ensuring that user data is secure even in the face of quantum computing threats. The cryptography libraries used are designed to provide robust protection against the future risks posed by quantum computing.
 
 ---
 
 ## Roadmap
 
 ### Phase 1: Development & Token Sale
-- Complete development of CipherCore's blockchain protocol.
+- Complete development of SypherCore's blockchain protocol.
 - Launch the first **Token Sale**.
-- Expand CipherCore’s ecosystem by onboarding developers to create privacy-based dApps using Cipherlang.
+- Expand CipherCore’s ecosystem by onboarding developers to create privacy-based dApps using Sypherlang.
 
 ### Phase 2: Mainnet Launch & Staking
-- Launch the **CipherCore Mainnet**.
+- Launch the **SypherCore Mainnet**.
 - Introduce **Proof of Stake** mechanism and **staking rewards**.
 - Encourage community participation through staking.
 
 ### Phase 3: Privacy dApps & Integration
-- Begin integrating **privacy smart contracts** into the CipherCore network.
+- Begin integrating **privacy smart contracts** into the SypherCore network.
 - Launch partnerships with existing dApp developers to build privacy-focused decentralized applications.
 
 ### Phase 4: Quantum-Resistant Features
@@ -110,15 +110,15 @@ CipherCore utilizes **lattice-based cryptography** for **quantum-resistance**, e
 
 ## Conclusion
 
-CipherCore is a revolutionary project designed to offer unmatched privacy, security, and decentralization. By leveraging **Zero-Knowledge Proofs**, **Quantum-Resistant Cryptography**, and **Cipherlang**, CipherCore is building the next generation of privacy-focused blockchain technology. With its fully private transactions, privacy smart contracts, and forward-looking cryptographic algorithms, CipherCore is poised to become the global standard for secure and private digital assets.
+SypherCore is a revolutionary project designed to offer unmatched privacy, security, and decentralization. By leveraging **Zero-Knowledge Proofs**, **Quantum-Resistant Cryptography**, and **Sypherlang**, SypherCore is building the next generation of privacy-focused blockchain technology. With its fully private transactions, privacy smart contracts, and forward-looking cryptographic algorithms, SypherCore is poised to become the global standard for secure and private digital assets.
 
-The CipherCore network will offer the most advanced privacy and security for users, developers, and businesses alike, providing an ecosystem where privacy is guaranteed by design.
+The SypherCore network will offer the most advanced privacy and security for users, developers, and businesses alike, providing an ecosystem where privacy is guaranteed by design.
 
 ---
 
-**For more information, visit: [ciphercore.io](https://ciphercore.io)**  
-**Follow us on Twitter: [@CipherCore](https://twitter.com/CipherCore)**  
-**Join our Community: [Telegram](https://t.me/CipherCoreCommunity)**
+**For more information, visit: [Syphercore.io](https://)**  
+**Follow us on Twitter: [@SypherCoreTech](https://twitter.com/SypherCoreTech)**  
+**Join our 
 
 ---
 
