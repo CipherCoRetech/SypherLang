@@ -14,7 +14,7 @@ As blockchain technology continues to gain popularity, the need for privacy and 
 
 ### SypherCore: A Revolutionary Solution
 
-SypherCore is designed to address these issues by introducing 100% privacy for transactions, contracts, and decentralized applications. By utilizing **Zero-Knowledge Proofs (ZKPs)**, **Quantum-Resistant Cryptography**, and **Cipherlang**, a new programming language, CipherCore provides the next level of privacy and security for blockchain users. SypherCore is not just a privacy coin but a new paradigm for decentralized finance (DeFi) and smart contract execution.
+SypherCore is designed to address these issues by introducing 100% privacy for transactions, contracts, and decentralized applications. By utilizing **Zero-Knowledge Proofs (ZKPs)**, **Quantum-Resistant Cryptography**, and **Sypherlang**, a new programming language, SypherCore provides the next level of privacy and security for blockchain users. SypherCore is not just a privacy coin but a new paradigm for decentralized finance (DeFi) and smart contract execution.
 
 ---
 
@@ -22,7 +22,7 @@ SypherCore is designed to address these issues by introducing 100% privacy for t
 
 ### 1. Privacy Smart Contracts
 
-SypherCore introduces a new generation of **privacy smart contracts**. These contracts ensure that the terms, conditions, and transactions within the contract are fully encrypted, allowing only the involved parties to view or execute them. Built on **Zero-Knowledge Proofs (ZKPs)**, CipherCore's smart contracts provide private interactions without revealing any sensitive data to the network or third parties.
+SypherCore introduces a new generation of **privacy smart contracts**. These contracts ensure that the terms, conditions, and transactions within the contract are fully encrypted, allowing only the involved parties to view or execute them. Built on **Zero-Knowledge Proofs (ZKPs)**, SypherCore's smart contracts provide private interactions without revealing any sensitive data to the network or third parties.
 
 ### 2. Zero-Knowledge Proofs (ZKPs)
 
@@ -30,11 +30,11 @@ SypherCore uses **Zero-Knowledge Proofs (ZKPs)** to provide **confidentiality** 
 
 ### 3. Quantum-Resistant Cryptography
 
-To ensure that SypherCore remains secure in the future, even against the potential threats posed by quantum computing, CipherCore integrates **quantum-resistant cryptographic algorithms**. These algorithms utilize **lattice-based cryptography** to protect user data from quantum attacks, making CipherCore one of the most future-proof blockchains available.
+To ensure that SypherCore remains secure in the future, even against the potential threats posed by quantum computing, SypherCore integrates **quantum-resistant cryptographic algorithms**. These algorithms utilize **lattice-based cryptography** to protect user data from quantum attacks, making SypherCore one of the most future-proof blockchains available.
 
 ### 4. Sypherlang: A Privacy-Focused Programming Language
 
-SypherCore is powered by **Sypherlang**, a new programming language designed specifically for privacy. Cipherlang enables the creation of secure, private smart contracts and applications with ease. Unlike traditional programming languages, Cipherlang has built-in support for advanced privacy features like ZKPs and encrypted data storage. It also provides powerful libraries for cryptography and privacy-focused applications.
+SypherCore is powered by **Sypherlang**, a new programming language designed specifically for privacy. Cipherlang enables the creation of secure, private smart contracts and applications with ease. Unlike traditional programming languages, Sypherlang has built-in support for advanced privacy features like ZKPs and encrypted data storage. It also provides powerful libraries for cryptography and privacy-focused applications.
 
 ---
 
@@ -61,9 +61,9 @@ SypherCore operates on a **Proof of Stake (PoS)** consensus model, allowing user
 - Initial **Annual Reward Rate**: 10% per year
 - Adjusted dynamically based on the total amount staked and network health
 
-### 3. Utility of CipherCore Token (CORE)
+### 3. Utility of SypherCore Token (CORE)
 
-SypherCore tokens (CORE) serve multiple purposes within the CipherCore ecosystem:
+SypherCore tokens (CORE) serve multiple purposes within the SypherCore ecosystem:
 - **Transaction Fees**: Used to pay for transaction processing, including private transactions.
 - **Staking**: Tokens are staked to secure the network and validate transactions.
 - **Governance**: Token holders can participate in governance decisions, such as voting on protocol upgrades.
