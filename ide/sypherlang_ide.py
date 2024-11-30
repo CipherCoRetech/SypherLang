@@ -1,123 +1,169 @@
+import tkinter as tk
+from tkinter import filedialog, messagebox, scrolledtext
 import os
-import sys
 import subprocess
-import threading
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QTextEdit, QFileDialog,
-                             QAction, QMessageBox, QVBoxLayout, QWidget, QPushButton, QLabel)
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt, pyqtSignal
+from tkinter import ttk
+import keyword
+import re
 
-class SypherLangIDE(QMainWindow):
-    output_signal = pyqtSignal(str)
+class SypherLangIDE:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("SypherLang IDE")
+        self.root.geometry("1000x700")
+        self.create_widgets()
+        self.filename = None
 
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("SypherLang IDE")
-        self.setGeometry(200, 100, 1200, 800)
+    def create_widgets(self):
+        # Create Menu
+        menu_bar = tk.Menu(self.root)
+        self.root.config(menu=menu_bar)
 
-        # Initialize UI components
-        self.editor = QTextEdit(self)
-        self.editor.setFont(QFont("Courier", 12))
-        self.output_display = QTextEdit(self)
-        self.output_display.setFont(QFont("Courier", 10))
-        self.output_display.setReadOnly(True)
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="New", command=self.new_file)
+        file_menu.add_command(label="Open", command=self.open_file)
+        file_menu.add_command(label="Save", command=self.save_file)
+        file_menu.add_command(label="Save As", command=self.save_as)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
 
-        # Set Layout
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("SypherLang Code Editor:"))
-        layout.addWidget(self.editor, 7)
-        layout.addWidget(QLabel("Output Console:"))
-        layout.addWidget(self.output_display, 3)
-        central_widget = QWidget(self)
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
+        run_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Run", menu=run_menu)
+        run_menu.add_command(label="Run File", command=self.run_file)
 
-        # Menu
-        self.init_menu()
+        # Create Toolbar
+        toolbar = tk.Frame(self.root, bd=1, relief=tk.RAISED)
+        toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        # Signals
-        self.output_signal.connect(self.update_output)
+        self.syntax_highlight_button = ttk.Button(toolbar, text="Syntax Highlight", command=self.syntax_highlight)
+        self.syntax_highlight_button.pack(side=tk.LEFT, padx=2, pady=2)
 
-    def init_menu(self):
-        menu_bar = self.menuBar()
+        self.autocomplete_button = ttk.Button(toolbar, text="Autocomplete", command=self.autocomplete)
+        self.autocomplete_button.pack(side=tk.LEFT, padx=2, pady=2)
 
-        # File Menu
-        file_menu = menu_bar.addMenu("&File")
+        # Create Editor
+        self.editor = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, undo=True, font=("Courier New", 12))
+        self.editor.pack(fill=tk.BOTH, expand=1)
+        self.editor.bind('<KeyRelease>', self.on_key_release)
 
-        open_action = QAction("&Open", self)
-        open_action.setShortcut("Ctrl+O")
-        open_action.triggered.connect(self.open_file)
-        file_menu.addAction(open_action)
+        # Create Console
+        self.console = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, height=10, state='disabled', font=("Courier New", 12), bg='black', fg='white')
+        self.console.pack(fill=tk.X)
 
-        save_action = QAction("&Save", self)
-        save_action.setShortcut("Ctrl+S")
-        save_action.triggered.connect(self.save_file)
-        file_menu.addAction(save_action)
-
-        exit_action = QAction("&Exit", self)
-        exit_action.setShortcut("Ctrl+Q")
-        exit_action.triggered.connect(self.close)
-        file_menu.addAction(exit_action)
-
-        # Run Menu
-        run_menu = menu_bar.addMenu("&Run")
-        run_action = QAction("&Run Code", self)
-        run_action.setShortcut("F5")
-        run_action.triggered.connect(self.run_code)
-        run_menu.addAction(run_action)
+    def new_file(self):
+        self.filename = None
+        self.editor.delete(1.0, tk.END)
 
     def open_file(self):
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open SypherLang File", "", "SypherLang Files (*.sypher);;All Files (*)", options=options)
-        if file_name:
-            with open(file_name, 'r') as file:
-                self.editor.setText(file.read())
+        self.filename = filedialog.askopenfilename(defaultextension=".sypher", filetypes=[("SypherLang Files", "*.sypher"), ("All Files", "*.*")])
+        if self.filename:
+            with open(self.filename, "r") as f:
+                self.editor.delete(1.0, tk.END)
+                self.editor.insert(tk.INSERT, f.read())
 
     def save_file(self):
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getSaveFileName(self, "Save SypherLang File", "", "SypherLang Files (*.sypher);;All Files (*)", options=options)
-        if file_name:
-            with open(file_name, 'w') as file:
-                file.write(self.editor.toPlainText())
-
-    def run_code(self):
-        code = self.editor.toPlainText()
-        if not code.strip():
-            QMessageBox.warning(self, "Warning", "Cannot run empty code.")
-            return
-        self.output_display.clear()
-        threading.Thread(target=self.execute_code, args=(code,)).start()
-
-    def execute_code(self, code):
-        try:
-            # Assume 'sypherlang_interpreter' is the command-line tool to run SypherLang code
-            process = subprocess.Popen(['sypherlang_interpreter'],
-                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                       text=True)
-            stdout, stderr = process.communicate(input=code)
-
-            if stderr:
-                self.output_signal.emit(f"[ERROR]\n{stderr}")
-            else:
-                self.output_signal.emit(f"[OUTPUT]\n{stdout}")
-        except FileNotFoundError:
-            self.output_signal.emit("[ERROR]\nSypherLang interpreter not found. Please make sure it is installed and available in your PATH.")
-        except Exception as e:
-            self.output_signal.emit(f"[ERROR]\n{str(e)}")
-
-    def update_output(self, text):
-        self.output_display.append(text)
-
-    def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Exit', "Are you sure you want to quit?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            event.accept()
+        if self.filename:
+            with open(self.filename, "w") as f:
+                f.write(self.editor.get(1.0, tk.END))
         else:
-            event.ignore()
+            self.save_as()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ide = SypherLangIDE()
-    ide.show()
-    sys.exit(app.exec_())
+    def save_as(self):
+        self.filename = filedialog.asksaveasfilename(defaultextension=".sypher", filetypes=[("SypherLang Files", "*.sypher"), ("All Files", "*.*")])
+        if self.filename:
+            self.save_file()
+
+    def run_file(self):
+        if not self.filename:
+            messagebox.showerror("Error", "Please save your file before running.")
+            return
+        self.save_file()
+        command = ["python", "interpreter.py", self.filename]
+        try:
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            output = e.output
+
+        self.console.configure(state='normal')
+        self.console.delete(1.0, tk.END)
+        self.console.insert(tk.INSERT, output)
+        self.console.configure(state='disabled')
+
+    def syntax_highlight(self):
+        """
+        Highlight SypherLang keywords in the editor.
+        """
+        self.editor.tag_remove("keyword", "1.0", tk.END)
+        words = r'\b(' + '|'.join(keyword.kwlist + ["function", "let", "encrypt", "prove_privacy", "execute_parallel"]) + r')\b'
+        matches = re.finditer(words, self.editor.get(1.0, tk.END))
+
+        for match in matches:
+            start_idx = f"1.0 + {match.start()} chars"
+            end_idx = f"1.0 + {match.end()} chars"
+            self.editor.tag_add("keyword", start_idx, end_idx)
+
+        self.editor.tag_config("keyword", foreground="blue", font=("Courier New", 12, "bold"))
+
+    def on_key_release(self, event=None):
+        """
+        Highlight syntax after key release.
+        """
+        self.syntax_highlight()
+
+    def autocomplete(self):
+        """
+        Provide simple autocompletion for common SypherLang functions and keywords.
+        """
+        cursor_position = self.editor.index(tk.INSERT)
+        line_content = self.editor.get(f"{cursor_position} linestart", cursor_position)
+        tokens = ["function", "let", "encrypt", "decrypt", "prove_privacy", "execute_parallel", "zkp_verify", "parallel_exec", "quantum_safe"]
+
+        for token in tokens:
+            if line_content.endswith(token[:3]):
+                self.editor.insert(tk.INSERT, token[3:])
+                return
+
+    def autocomplete_suggestions(self, event=None):
+        """
+        Suggest possible completions based on current text input.
+        """
+        cursor_index = self.editor.index(tk.INSERT)
+        current_line = self.editor.get(f"{cursor_index} linestart", cursor_index)
+        possible_completions = [kw for kw in keyword.kwlist if current_line.strip() in kw]
+        if possible_completions:
+            self.console.configure(state='normal')
+            self.console.insert(tk.END, "\nSuggestions: " + ', '.join(possible_completions))
+            self.console.configure(state='disabled')
+
+    def find_and_replace(self):
+        """
+        Launch a simple find and replace utility.
+        """
+        find_window = tk.Toplevel(self.root)
+        find_window.title("Find and Replace")
+
+        tk.Label(find_window, text="Find:").grid(row=0, column=0, padx=4, pady=4)
+        tk.Label(find_window, text="Replace:").grid(row=1, column=0, padx=4, pady=4)
+
+        find_entry = tk.Entry(find_window)
+        replace_entry = tk.Entry(find_window)
+
+        find_entry.grid(row=0, column=1, padx=4, pady=4)
+        replace_entry.grid(row=1, column=1, padx=4, pady=4)
+
+        def replace_text():
+            find_text = find_entry.get()
+            replace_text = replace_entry.get()
+            content = self.editor.get(1.0, tk.END)
+            new_content = content.replace(find_text, replace_text)
+            self.editor.delete(1.0, tk.END)
+            self.editor.insert(1.0, new_content)
+
+        replace_button = tk.Button(find_window, text="Replace All", command=replace_text)
+        replace_button.grid(row=2, column=1, sticky=tk.W, padx=4, pady=4)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    ide = SypherLangIDE(root)
+    root.mainloop()
