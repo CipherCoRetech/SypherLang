@@ -1,87 +1,135 @@
-from lexer import Lexer
-from ast import Program, VariableDeclaration, Assignment, BinaryOperation
+from ast import ASTNode
 
 class Parser:
     """
-    Parser class to parse tokens and produce an Abstract Syntax Tree (AST).
+    Parser for SypherLang that converts a list of tokens into an Abstract Syntax Tree (AST).
+    It takes tokens from the lexer and builds a structured tree representation of the program.
     """
 
-    def __init__(self, tokens):
+    def __init__(self):
+        self.tokens = []
+        self.current_token_index = 0
+
+    def parse(self, tokens):
+        """
+        Parse the list of tokens to generate an AST.
+        
+        :param tokens: List of tokens to parse.
+        :return: Root of the generated AST.
+        """
         self.tokens = tokens
         self.current_token_index = 0
-        self.current_token = self.tokens[self.current_token_index]
-    
-    def eat(self, token_type):
-        """
-        Consume the current token if it matches the expected type.
-        """
-        if self.current_token.type == token_type:
-            self.current_token_index += 1
-            if self.current_token_index < len(self.tokens):
-                self.current_token = self.tokens[self.current_token_index]
-        else:
-            raise SyntaxError(f"Expected token {token_type}, but got {self.current_token.type}")
+        return self.program()
 
-    def parse(self):
+    def program(self):
         """
-        Parse the token list to create an AST.
-        """
-        return self.parse_program()
-
-    def parse_program(self):
-        """
-        Parse a program, which consists of a list of statements.
-        """
-        root = Program()
-
-        while self.current_token_index < len(self.tokens):
-            if self.current_token.type == 'ID':
-                root.add_child(self.parse_assignment())
-            elif self.current_token.type == 'NUMBER':
-                raise SyntaxError("Unexpected number")
-            else:
-                self.eat(self.current_token.type)  # Skips over unrecognized tokens for simplicity
+        Parse the entire program.
         
-        return root
+        :return: Root node of the AST representing the program.
+        """
+        nodes = []
+        while self.current_token_index < len(self.tokens):
+            nodes.append(self.statement())
+        return ASTNode(type='program', body=nodes)
 
-    def parse_assignment(self):
+    def statement(self):
+        """
+        Parse a statement.
+        
+        :return: AST node representing the statement.
+        """
+        token_type, token_value = self.current_token()
+        if token_type == 'KEYWORD' and token_value == 'let':
+            return self.assignment_statement()
+        elif token_type == 'KEYWORD' and token_value == 'function':
+            return self.function_statement()
+        elif token_type == 'IDENTIFIER':
+            return self.expression()
+        else:
+            raise ValueError(f"Unexpected token {token_value} at index {self.current_token_index}")
+
+    def assignment_statement(self):
         """
         Parse an assignment statement.
+        
+        :return: AST node representing the assignment.
         """
-        var_name = self.current_token.value
-        self.eat('ID')
-        self.eat('ASSIGN')
-        value = self.parse_expression()
-        self.eat('SEMICOLON')
+        self.consume('KEYWORD', 'let')
+        identifier = self.consume('IDENTIFIER')
+        self.consume('OPERATOR', '=')
+        value = self.expression()
+        self.consume('DELIMITER', ';')
+        return ASTNode(type='assignment', name=identifier, value=value)
 
-        return Assignment(var_name, value)
-
-    def parse_expression(self):
+    def function_statement(self):
         """
-        Parse an expression, which can currently only be a simple binary operation.
+        Parse a function definition.
+        
+        :return: AST node representing the function.
         """
-        left = self.current_token.value
-        self.eat('NUMBER')
+        self.consume('KEYWORD', 'function')
+        function_name = self.consume('IDENTIFIER')
+        self.consume('DELIMITER', '(')
+        args = []
+        while self.current_token()[1] != ')':
+            args.append(self.consume('IDENTIFIER'))
+            if self.current_token()[1] == ',':
+                self.consume('DELIMITER', ',')
+        self.consume('DELIMITER', ')')
+        self.consume('DELIMITER', '{')
+        body = []
+        while self.current_token()[1] != '}':
+            body.append(self.statement())
+        self.consume('DELIMITER', '}')
+        return ASTNode(type='function_call', function_name=function_name, args=args, body=body)
 
-        if self.current_token.type in ('PLUS', 'MINUS', 'MULT', 'DIV'):
-            operator = self.current_token.value
-            self.eat(self.current_token.type)
+    def expression(self):
+        """
+        Parse an expression (could be arithmetic or logical).
+        
+        :return: AST node representing the expression.
+        """
+        left = self.term()
+        while self.current_token()[1] in ('+', '-'):
+            operator = self.consume('OPERATOR')
+            right = self.term()
+            left = ASTNode(type='expression', left=left, right=right, operator=operator)
+        return left
 
-            right = self.current_token.value
-            self.eat('NUMBER')
-
-            return BinaryOperation(left, operator, right)
+    def term(self):
+        """
+        Parse a term for expressions.
+        
+        :return: AST node representing the term.
+        """
+        token_type, token_value = self.current_token()
+        if token_type == 'NUMBER':
+            self.consume('NUMBER')
+            return ASTNode(type='literal', value=int(token_value))
+        elif token_type == 'IDENTIFIER':
+            self.consume('IDENTIFIER')
+            return ASTNode(type='variable', name=token_value)
         else:
-            raise SyntaxError(f"Unexpected token in expression: {self.current_token.type}")
+            raise ValueError(f"Unexpected token {token_value} at index {self.current_token_index}")
 
+    def current_token(self):
+        """
+        Get the current token in the list.
+        
+        :return: Current token (type, value)
+        """
+        return self.tokens[self.current_token_index]
 
-# Example usage:
-if __name__ == "__main__":
-    code = "x = 5 + 3;"
-    lexer = Lexer(code)
-    tokens = lexer.tokenize()
-
-    parser = Parser(tokens)
-    ast = parser.parse()
-    print(ast)
-# Parser implementation
+    def consume(self, expected_type, expected_value=None):
+        """
+        Consume the current token if it matches the expected type and value.
+        
+        :param expected_type: Expected type of the token.
+        :param expected_value: Optional expected value of the token.
+        :return: The value of the token consumed.
+        """
+        token_type, token_value = self.current_token()
+        if token_type != expected_type or (expected_value is not None and token_value != expected_value):
+            raise ValueError(f"Expected token {expected_type} '{expected_value}', got {token_type} '{token_value}'")
+        self.current_token_index += 1
+        return token_value
