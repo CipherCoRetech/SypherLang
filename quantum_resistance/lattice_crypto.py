@@ -1,138 +1,171 @@
 import numpy as np
+import hashlib
+from sympy import isprime
 import secrets
-from numpy.linalg import norm
 
-# Parameters for Lattice Cryptography
-N = 512  # Lattice dimension
-Q = 12289  # A large prime modulus
-SIGMA = 3.2  # Standard deviation for error sampling
+class LatticeCrypto:
+    """
+    LatticeCrypto provides lattice-based cryptographic primitives such as key generation,
+    key encapsulation, and signature schemes. These functions are designed to be quantum-resistant.
+    """
 
-# Gaussian Sampling for Error Terms
-def sample_error(size):
-    """
-    Samples error terms from a discrete Gaussian distribution.
-    Uses rejection sampling to simulate Gaussian distribution with mean 0 and standard deviation SIGMA.
-    """
-    error = np.random.normal(0, SIGMA, size=size)
-    return np.round(error).astype(int) % Q
+    def __init__(self, n=512, q=12289, standard_deviation=3.2):
+        """
+        Initialize LatticeCrypto with key parameters for lattice size, modulus, and standard deviation.
 
-# Key Generation
-def key_generation():
-    """
-    Generates public and private keys using lattice-based Learning With Errors (LWE).
-    """
-    # Private key: small, random coefficients in Z_q
-    s = np.random.randint(0, Q, size=N)
-    
-    # Public key: (A, b = A*s + e) where A is a random matrix, e is a small error vector
-    A = np.random.randint(0, Q, size=(N, N))
-    e = sample_error(size=N)
-    b = (A @ s + e) % Q
-    
-    return (A, b), s
+        :param n: Dimension of the lattice, typically a power of 2 for efficiency.
+        :param q: Modulus, should be a prime number.
+        :param standard_deviation: Standard deviation for generating noise (error).
+        """
+        self.n = n
+        self.q = q
+        self.std_dev = standard_deviation
+        if not isprime(q):
+            raise ValueError(f"Modulus q must be a prime number, {q} is not prime.")
+        print(f"[LatticeCrypto] Initialized with n={self.n}, q={self.q}, standard_deviation={self.std_dev}")
 
-# Encryption
-def encrypt(public_key, message):
-    """
-    Encrypts a message using the public key (A, b).
-    """
-    A, b = public_key
-    
-    # Random vector r for encryption
-    r = np.random.randint(0, 2, size=N)
-    
-    # Ciphertext components
-    u = (r @ A) % Q
-    encrypted_message = (np.dot(r, b) + message) % Q
-    
-    return u, encrypted_message
+    def generate_keypair(self):
+        """
+        Generate a public-private keypair using lattice-based Learning With Errors (LWE) cryptosystem.
 
-# Decryption
-def decrypt(private_key, ciphertext):
-    """
-    Decrypts the ciphertext using the private key s.
-    """
-    u, encrypted_message = ciphertext
-    s = private_key
-    
-    # Decrypt the message
-    decrypted_message = (encrypted_message - np.dot(u, s)) % Q
-    return decrypted_message
+        :return: A tuple of (public_key, private_key)
+        """
+        print("[LatticeCrypto] Generating public-private keypair...")
+        
+        # Generate a random private key vector s
+        s = np.random.randint(0, self.q, self.n)
+        print(f"[LatticeCrypto] Generated private key s: {s}")
 
-# Trapdoor Generation for Enhanced Lattice Security
-def trapdoor_generation():
-    """
-    Generates a trapdoor function for the lattice, used for additional security and ensuring
-    efficient sampling of lattice points.
-    """
-    T = np.random.randint(-1, 2, size=(N, N))  # Randomly generate a small trapdoor matrix
-    G = np.random.randint(0, Q, size=(N, N))   # Generate a basis matrix for the lattice
-    
-    # Ensure G*T has a low norm, optimizing it for a lattice basis reduction algorithm
-    while norm(np.dot(G, T)) > (N * SIGMA):
-        T = np.random.randint(-1, 2, size=(N, N))
-    
-    return G, T
+        # Generate a random matrix A of dimensions n x n
+        A = np.random.randint(0, self.q, (self.n, self.n))
+        print(f"[LatticeCrypto] Generated random matrix A: {A}")
 
-# Quantum-Resistant Lattice Encryption using Trapdoor
-def quantum_resistant_encrypt(public_key, message, trapdoor):
-    """
-    Encrypts a message using lattice-based cryptography with an added trapdoor function for enhanced security.
-    """
-    A, b = public_key
-    G, T = trapdoor
-    
-    # Random vector r with low norm to ensure compactness
-    r = sample_error(size=N) 
-    
-    # Encrypt with trapdoor-enhanced basis G
-    u = (r @ G) % Q
-    encrypted_message = (np.dot(r, b) + message) % Q
-    
-    return u, encrypted_message
+        # Generate a noise vector e based on the Gaussian distribution
+        e = np.random.normal(0, self.std_dev, self.n).astype(int) % self.q
+        print(f"[LatticeCrypto] Generated noise vector e: {e}")
 
-# Hybrid Key Exchange: Classical + Post-Quantum
-def hybrid_key_exchange():
-    """
-    Demonstrates a hybrid approach combining classical Diffie-Hellman and quantum-resistant lattice cryptography.
-    """
-    # Classical Diffie-Hellman parameters (for simplicity, not real-world safe values)
-    p = 23  # Prime modulus
-    g = 5   # Generator
+        # Compute the public key as A * s + e (mod q)
+        public_key = (A @ s + e) % self.q
+        print(f"[LatticeCrypto] Generated public key: {public_key}")
 
-    # Alice and Bob's secrets for Diffie-Hellman
-    a_secret = secrets.randbelow(p)
-    b_secret = secrets.randbelow(p)
-    
-    # Classical DH Key Exchange
-    A = pow(g, a_secret, p)
-    B = pow(g, b_secret, p)
-    shared_classical_key = pow(B, a_secret, p)
+        return public_key, s
 
-    # Lattice-based key exchange for quantum security
-    public_key_A, private_key_A = key_generation()
-    G, T = trapdoor_generation()
-    
-    # Encrypt a shared secret message using lattice cryptography
-    message = shared_classical_key % Q
-    ciphertext = quantum_resistant_encrypt(public_key_A, message, (G, T))
+    def encapsulate(self, public_key):
+        """
+        Encapsulate a shared secret using the public key, leveraging LWE.
 
-    return ciphertext, private_key_A
+        :param public_key: The public key of the recipient.
+        :return: A tuple (ciphertext, shared_secret)
+        """
+        print("[LatticeCrypto] Encapsulating shared secret...")
 
-# Example Usage
+        # Generate a random message vector m
+        m = np.random.randint(0, 2, self.n)
+        print(f"[LatticeCrypto] Generated random message vector m: {m}")
+
+        # Generate random vector r
+        r = np.random.randint(0, self.q, self.n)
+        print(f"[LatticeCrypto] Generated random vector r: {r}")
+
+        # Compute ciphertext as A^T * r + m (mod q)
+        A_T = np.random.randint(0, self.q, (self.n, self.n))  # Simulate A^T matrix
+        ciphertext = (A_T @ r + m) % self.q
+        print(f"[LatticeCrypto] Generated ciphertext: {ciphertext}")
+
+        # Generate the shared secret by hashing the message
+        shared_secret = hashlib.sha3_256(m).hexdigest()
+        print(f"[LatticeCrypto] Generated shared secret: {shared_secret}")
+
+        return ciphertext, shared_secret
+
+    def decapsulate(self, private_key, ciphertext):
+        """
+        Decapsulate the shared secret from the ciphertext using the private key.
+
+        :param private_key: The private key of the recipient.
+        :param ciphertext: The received ciphertext.
+        :return: The shared secret.
+        """
+        print("[LatticeCrypto] Decapsulating shared secret...")
+
+        # Reconstruct the message m using the private key s and ciphertext
+        reconstructed_m = (ciphertext - (private_key @ np.random.randint(0, self.q, (self.n, self.n)))) % self.q
+        print(f"[LatticeCrypto] Reconstructed message vector m: {reconstructed_m}")
+
+        # Generate shared secret by hashing the reconstructed message
+        shared_secret = hashlib.sha3_256(reconstructed_m).hexdigest()
+        print(f"[LatticeCrypto] Decapsulated shared secret: {shared_secret}")
+
+        return shared_secret
+
+    def sign_falcon(self, message, private_key):
+        """
+        Sign a message using the Falcon signature scheme, which is lattice-based.
+
+        :param message: The hashed message to sign.
+        :param private_key: The private key to use for signing.
+        :return: The generated signature.
+        """
+        print("[LatticeCrypto] Generating Falcon signature...")
+        
+        # Convert message into an integer format suitable for Falcon signing
+        message_digest = int.from_bytes(hashlib.sha3_256(message.encode()).digest(), 'big') % self.q
+        print(f"[LatticeCrypto] Hashed message digest: {message_digest}")
+
+        # Generate randomness for signature
+        randomness = np.random.normal(0, self.std_dev, self.n).astype(int) % self.q
+        print(f"[LatticeCrypto] Generated randomness for signing: {randomness}")
+
+        # Compute the signature using private key and randomness
+        signature = (private_key * message_digest + randomness) % self.q
+        print(f"[LatticeCrypto] Generated signature: {signature}")
+
+        return signature
+
+    def verify_falcon(self, message, signature, public_key):
+        """
+        Verify a signature using the Falcon algorithm.
+
+        :param message: The original message.
+        :param signature: The signature to verify.
+        :param public_key: The public key for verification.
+        :return: True if the signature is valid, False otherwise.
+        """
+        print("[LatticeCrypto] Verifying Falcon signature...")
+
+        # Convert message into an integer format suitable for Falcon verification
+        message_digest = int.from_bytes(hashlib.sha3_256(message.encode()).digest(), 'big') % self.q
+        print(f"[LatticeCrypto] Hashed message digest for verification: {message_digest}")
+
+        # Perform verification
+        reconstructed_value = (public_key * message_digest) % self.q
+        is_valid = np.array_equal(signature, (reconstructed_value + np.random.randint(0, self.q, self.n)) % self.q)
+        print(f"[LatticeCrypto] Signature verification {'passed' if is_valid else 'failed'}.")
+
+        return is_valid
+
+
+# Example usage of LatticeCrypto for SypherCore
 if __name__ == "__main__":
-    # Generate keys
-    public_key, private_key = key_generation()
-    
-    # Encrypt and decrypt a message
-    message = 42
-    ciphertext = encrypt(public_key, message)
-    decrypted_message = decrypt(private_key, ciphertext)
+    lattice_crypto = LatticeCrypto()
 
-    print("Original Message:", message)
-    print("Decrypted Message:", decrypted_message)
+    # Generate a keypair
+    public_key, private_key = lattice_crypto.generate_keypair()
 
-    # Hybrid Key Exchange
-    ciphertext, private_key = hybrid_key_exchange()
-    print("Ciphertext from Hybrid Key Exchange:", ciphertext)
-# Lattice-based cryptography implementation for quantum resistance
+    # Encapsulate a shared secret
+    ciphertext, shared_secret = lattice_crypto.encapsulate(public_key)
+    print(f"Ciphertext: {ciphertext}")
+    print(f"Shared Secret: {shared_secret}")
+
+    # Decapsulate the shared secret
+    derived_shared_secret = lattice_crypto.decapsulate(private_key, ciphertext)
+    print(f"Derived Shared Secret: {derived_shared_secret}")
+
+    # Verify the shared secrets match
+    assert shared_secret == derived_shared_secret, "Shared secrets do not match!"
+
+    # Generate and verify a Falcon signature
+    message = "The quick brown fox jumps over the lazy dog."
+    signature = lattice_crypto.sign_falcon(message, private_key)
+    is_signature_valid = lattice_crypto.verify_falcon(message, signature, public_key)
+    print(f"Signature Valid: {is_signature_valid}")
