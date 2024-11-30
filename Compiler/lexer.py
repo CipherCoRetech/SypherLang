@@ -1,68 +1,45 @@
 import re
 
-class Token:
-    """
-    Represents a token with type and value.
-    """
-
-    def __init__(self, token_type, value):
-        self.type = token_type
-        self.value = value
-
-    def __repr__(self):
-        return f"Token({self.type}, {self.value})"
-
-
 class Lexer:
     """
-    Lexer class to tokenize the input source code.
+    Lexer for SypherLang that converts source code into tokens.
+    It splits the input into meaningful symbols such as keywords, operators, literals, and identifiers.
     """
 
-    def __init__(self, source_code):
-        self.source_code = source_code
-        self.tokens = []
-        self.current_pos = 0
-
-        # Token patterns (regular expressions)
-        self.token_specs = [
-            ('NUMBER',   r'\d+'),
-            ('ID',       r'[a-zA-Z_][a-zA-Z0-9_]*'),
-            ('PLUS',     r'\+'),
-            ('MINUS',    r'-'),
-            ('MULT',     r'\*'),
-            ('DIV',      r'/'),
-            ('ASSIGN',   r'='),
-            ('LPAREN',   r'\('),
-            ('RPAREN',   r'\)'),
-            ('SEMICOLON', r';'),
-            ('SKIP',     r'[ \t\n]+'),  # Skip over spaces and tabs
-            ('MISMATCH', r'.'),          # Any other character
+    def __init__(self):
+        # Regular expressions for SypherLang tokens
+        self.token_patterns = [
+            ('KEYWORD', r'\b(function|if|else|while|let|encrypt|prove_privacy|execute_parallel)\b'),
+            ('IDENTIFIER', r'\b[a-zA-Z_][a-zA-Z0-9_]*\b'),
+            ('NUMBER', r'\b\d+\b'),
+            ('STRING', r'"[^"]*"'),
+            ('OPERATOR', r'[+\-*/=]'),
+            ('DELIMITER', r'[{}(),;]'),
+            ('WHITESPACE', r'\s+'),
+            ('UNKNOWN', r'.')
         ]
-        self.token_regex = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in self.token_specs)
 
-    def tokenize(self):
+    def tokenize(self, code):
         """
-        Tokenize the entire input string.
+        Tokenize the input source code.
+        
+        :param code: The SypherLang source code as a string.
+        :return: A list of tokens.
         """
-        for match in re.finditer(self.token_regex, self.source_code):
-            token_type = match.lastgroup
-            value = match.group(token_type)
-            if token_type == 'SKIP':
-                continue
-            elif token_type == 'MISMATCH':
-                raise SyntaxError(f"Unexpected character: {value}")
+        tokens = []
+        position = 0
+        while position < len(code):
+            for token_type, pattern in self.token_patterns:
+                regex = re.compile(pattern)
+                match = regex.match(code, position)
+                if match:
+                    lexeme = match.group(0)
+                    position = match.end()
+                    if token_type != 'WHITESPACE':
+                        tokens.append((token_type, lexeme))
+                    break
             else:
-                token = Token(token_type, value)
-                self.tokens.append(token)
-
-        return self.tokens
-
-
-# Example usage:
-if __name__ == "__main__":
-    code = "int x = 5 + 3;"
-    lexer = Lexer(code)
-    tokens = lexer.tokenize()
-    for token in tokens:
-        print(token)
-# Lexer implementation
+                raise ValueError(f"Unknown token at position {position}: {code[position]}")
+        
+        print(f"[Lexer] Tokenized source code into: {tokens}")
+        return tokens
