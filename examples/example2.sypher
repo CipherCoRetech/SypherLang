@@ -1,1 +1,54 @@
+/*
+    example1.sypher
+    
+    This SypherLang smart contract example showcases a fundamental privacy-preserving financial contract. 
+    It demonstrates how SypherLang allows secure, anonymous transactions between participants.
+*/
+
+contract Example1 {
+    // State Variables
+    privateKey Alice;
+    privateKey Bob;
+    uint256 initialAmount;
+    
+    // Initialize Contract
+    function initialize(privateKey _alice, privateKey _bob, uint256 _initialAmount) public {
+        Alice = _alice;
+        Bob = _bob;
+        initialAmount = _initialAmount;
+    }
+
+    // Privacy Preserving Transaction Function
+    function privateTransaction() public {
+        // Zero-Knowledge Proof
+        proof zkProof = zkProve(initialAmount, Alice, Bob);
+        
+        require(verifyZkProof(zkProof), "Verification of proof failed.");
+        
+        // Transfer Amount
+        transferAmount(initialAmount, Bob);
+    }
+    
+    // Function to transfer amount between participants securely
+    function transferAmount(uint256 amount, privateKey recipient) private {
+        /*
+            Implement homomorphic encryption here to enable secure fund transfer. 
+            Ensure transaction remains confidential through privacy-preserving encryption techniques.
+        */
+        encrypt(amount, recipient);
+    }
+
+    // Function to generate a zero-knowledge proof
+    function zkProve(uint256 amount, privateKey sender, privateKey receiver) private returns (proof) {
+        return zkProof {amount, sender, receiver};
+    }
+
+    // Function to verify the zero-knowledge proof
+    function verifyZkProof(proof _proof) private view returns (bool) {
+        /*
+            Verifies zero-knowledge proof ensuring data integrity without revealing actual values.
+        */
+        return verify(_proof);
+    }
+}
 # Another example SypherLang script
