@@ -1,79 +1,43 @@
 class ASTNode:
     """
-    Base class for all AST nodes.
-    Each node in the AST has a type and may have children or attributes.
+    Class representing a node in the Abstract Syntax Tree.
+    Each node represents an element of the source code, such as expressions, assignments, or function calls.
     """
 
-    def __init__(self, node_type, **kwargs):
-        self.node_type = node_type
-        self.attributes = kwargs
-        self.children = []
-
-    def add_child(self, child_node):
-        self.children.append(child_node)
+    def __init__(self, type, value=None, name=None, left=None, right=None, operator=None, function_name=None, args=None, condition=None, body=None, data=None, contract=None, tasks=None):
+        self.type = type            # Type of node, e.g., 'assignment', 'expression', 'function_call'
+        self.value = value          # Value associated with the node, e.g., a constant value
+        self.name = name            # Name for variable assignment
+        self.left = left            # Left child for expressions
+        self.right = right          # Right child for expressions
+        self.operator = operator    # Operator for binary operations, e.g., '+', '-'
+        self.function_name = function_name  # Name of the function called
+        self.args = args            # Arguments for function calls
+        self.condition = condition  # Condition for control flow constructs
+        self.body = body            # Body of statements for control flow
+        self.data = data            # Data for quantum operations
+        self.contract = contract    # Privacy contract information
+        self.tasks = tasks          # Parallel execution tasks
 
     def __repr__(self):
-        return f"ASTNode({self.node_type}, {self.attributes}, children={len(self.children)})"
+        return f"ASTNode(type={self.type}, value={self.value}, name={self.name})"
 
-
-class Program(ASTNode):
-    """
-    Root node representing an entire program.
-    """
-
-    def __init__(self):
-        super().__init__(node_type="Program")
-
-
-class Function(ASTNode):
-    """
-    Node representing a function.
-    """
-
-    def __init__(self, name, return_type):
-        super().__init__(node_type="Function", name=name, return_type=return_type)
-
-
-class VariableDeclaration(ASTNode):
-    """
-    Node representing a variable declaration.
-    """
-
-    def __init__(self, var_name, var_type):
-        super().__init__(node_type="VariableDeclaration", name=var_name, var_type=var_type)
-
-
-class BinaryOperation(ASTNode):
-    """
-    Node representing a binary operation like addition or multiplication.
-    """
-
-    def __init__(self, left_operand, operator, right_operand):
-        super().__init__(node_type="BinaryOperation", operator=operator)
-        self.add_child(left_operand)
-        self.add_child(right_operand)
-
-
-class Assignment(ASTNode):
-    """
-    Node representing an assignment statement.
-    """
-
-    def __init__(self, variable, value):
-        super().__init__(node_type="Assignment", variable=variable)
-        self.add_child(value)
-
-
-# Example usage:
-# Creating a simple AST for: int x = 5 + 3;
-if __name__ == "__main__":
-    root = Program()
-    var_decl = VariableDeclaration("x", "int")
-    binary_op = BinaryOperation("5", "+", "3")
-    assignment = Assignment("x", binary_op)
-
-    root.add_child(var_decl)
-    root.add_child(assignment)
-
-    print(root)
-# Abstract Syntax Tree (AST) implementation
+    def to_dict(self):
+        """
+        Convert the AST node to a dictionary for easier serialization and debugging.
+        """
+        return {
+            "type": self.type,
+            "value": self.value,
+            "name": self.name,
+            "left": self.left.to_dict() if self.left else None,
+            "right": self.right.to_dict() if self.right else None,
+            "operator": self.operator,
+            "function_name": self.function_name,
+            "args": self.args,
+            "condition": self.condition,
+            "body": [n.to_dict() for n in self.body] if self.body else None,
+            "data": self.data,
+            "contract": self.contract,
+            "tasks": self.tasks
+        }
