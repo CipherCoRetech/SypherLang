@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  blockchain_node:
+    image: syphercore/blockchain-node:latest
+    container_name: sypher_blockchain_node
+    restart: always
+    ports:
+      - "8545:8545"  # RPC port for connecting to blockchain
+      - "30303:30303" # P2P networking port
+    volumes:
+      - ./src:/app/src
+      - ./genesis.json:/app/genesis.json
+    command: ["python", "/app/src/node.py", "--genesis", "/app/genesis.json"]
+    networks:
+      - sypher_network
+
+  wallet:
+    image: syphercore/wallet:latest
+    container_name: sypher_wallet
+    restart: always
+    ports:
+      - "8080:8080" # Wallet GUI access
+    volumes:
+      - ./wallet:/app/wallet
+      - ./wallet_icon.ico:/app/static/wallet_icon.ico
+    command: ["python", "/app/wallet/app.py"]
+    networks:
+      - sypher_network
+    depends_on:
+      - blockchain_node
+
+  faucet:
+    image: syphercore/faucet:latest
+    container_name: sypher_faucet
+    restart: always
+    ports:
+      - "9090:9090" # Faucet access
+    volumes:
+      - ./faucet:/app/faucet
+    command: ["python", "/app/faucet/faucet.py", "--rpc-url", "http://sypher_blockchain_node:8545"]
+    networks:
+      - sypher_network
+    depends_on:
+      - blockchain_node
+
+networks:
+  sypher_network:
+    driver: bridge
