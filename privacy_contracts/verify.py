@@ -1,0 +1,1 @@
+# Function to verify ZKP
